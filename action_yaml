@@ -261,3 +261,36 @@ jobs:
       - name: Upload Allure report to S3 bucket
         run: aws s3 sync allure-results-html s3://<bucket name>/
 
+---------------------------------------------------------------------------------
+name: Parallel Jobs Example
+
+on: push
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Job 1 Step 1
+        run: echo "Job 1 Step 1"
+      - name: Job 1 Step 2
+        run: echo "Job 1 Step 2"
+
+  job2:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps:
+      - name: Job 2 Step 1
+        run: echo "Job 2 Step 1"
+      - name: Job 2 Step 2
+        run: echo "Job 2 Step 2"
+
+  job3:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps:
+      - name: Job 3 Step 1
+        run: echo "Job 3 Step 1"
+      - name: Job 3 Step 2
+        run: echo "Job 3 Step 2"
+----------------------------------------------------------------------
+
