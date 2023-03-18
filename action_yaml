@@ -1,0 +1,229 @@
+Github Action Example for BootCamp
+------------------------------------------------------------
+$$ github action example to trigger workflow with github event
+
+###
+name: PR Opened
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  pr-opened:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Print pull request number
+        run: echo "PR number: ${{ github.event.pull_request.number }}"
+		
+---------------------------------------------------------------------------------------
+
+name: Push to master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production..."
+          # Add your deployment script here
+
+--------------------------------------------------------------------------------------------------
+name: PR Opened/Updated
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  pr-opened-updated:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and test
+        run: |
+          npm run build
+          npm test
+
+-----------------------------------------------------------------------
+name: Scheduled Job
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  scheduled-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run script
+        run: |
+          echo "Running scheduled job..."
+          # Add your script here
+
+
+---------------------------------------------------------------------------
+name: Tagged Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  tagged-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and test
+        run: |
+          npm install
+          npm run build
+          npm test
+
+      - name: Get tag name
+        id: tag-name
+        run: echo ::set-output name=tag-name::${GITHUB_REF#refs/tags/}
+
+      - name: Echo tag name
+        run: |
+          echo "New tag pushed: ${{ steps.tag-name.outputs.tag-name }}"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            dist/*
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+---------------------------------------------------------------------------------------
+name: Pushed to Tag
+
+on:
+  push:
+    tags:
+      - 'v1.*'
+
+jobs:
+  push-to-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Get tag name
+        id: tag-name
+        run: echo ::set-output name=tag-name::${GITHUB_REF#refs/tags/}
+
+      - name: Echo tag name
+        run: |
+          echo "New push to tag: ${{ steps.tag-name.outputs.tag-name }}"
+
+
+--------------------------------------------------------------------------------
+name: Directory Changes
+
+on:
+  push:
+    paths:
+      - 'path/to/directory/**'
+
+jobs:
+  directory-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: List changes
+        run: |
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'path/to/directory/'
+
+      # Add more steps here
+
+------------------------------------------------------------------------------------------------------
+name: Read Secret
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  read-secret:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read secret
+        run: echo ${{ secrets.MY_SECRET }}
+
+-----------------------------------------------------------------------------------------------------
+name: Pull and Run Hello World
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pull-and-run-hello-world:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Pull hello-world image
+        run: docker pull hello-world
+
+      - name: Run hello-world container
+        run: docker run hello-world
+
+      - name: Display output
+        run: docker logs $(docker ps -q -n1)
+
+------------------------------------------------------------------------------------------------------
